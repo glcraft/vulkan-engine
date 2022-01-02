@@ -1,10 +1,11 @@
-#include <iostream>
+#include <MainGame.h>
 
 using namespace std;
 
 int main(int argc, char** argv)
 {
-    
-    cout << "hello world!" << endl;
+    MainGame game;
+    game.init();
+    game.run();
     return 0;
 }

@@ -8,6 +8,12 @@ public:
     static constexpr uint32_t WINDOW_WIDTH = 800;
     static constexpr uint32_t WINDOW_HEIGHT = 600;
 
+    #ifdef DEBUG
+        static constexpr bool enableValidationLayers = true;
+    #else
+        static constexpr bool enableValidationLayers = false;
+    #endif
+
     MainGame();
     ~MainGame();
     void init();
@@ -22,5 +28,7 @@ private:
 
     bool m_isRunning;
     GLFWwindow* m_window;
+
+    std::unique_ptr<vkr::Context> m_context;
     std::unique_ptr<vkr::Instance> m_instance;
 };

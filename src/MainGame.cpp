@@ -6,7 +6,11 @@ MainGame::MainGame()
     m_window = nullptr;
 }
 MainGame::~MainGame()
-{}
+{
+    glfwDestroyWindow(m_window);
+
+    glfwTerminate();
+}
 void MainGame::init()
 {
     initWindow();
@@ -14,11 +18,16 @@ void MainGame::init()
 }
 void MainGame::run()
 {
-
+    while (m_isRunning)
+    {
+        update();
+        render();
+    }
 }
 void MainGame::update()
 {
-
+    glfwPollEvents();
+    m_isRunning = !glfwWindowShouldClose(m_window);
 }
 void MainGame::render()
 {
@@ -37,13 +46,16 @@ void MainGame::initWindow()
 }
 void MainGame::initVulkan()
 {
-    auto applicationInfo = vk::ApplicationInfo {
+    m_context = std::make_unique<vkr::Context>();
 
+    vk::ApplicationInfo applicationInfo = {
+        .pApplicationName = "Vulkan Engine",
+        .applicationVersion = VK_MAKE_VERSION(1, 0, 0),
+        .pEngineName = "No Engine",
     };
     auto createInfo = vk::InstanceCreateInfo {
-        .
+        .pApplicationInfo = &applicationInfo,
+        
     };
-    m_instance = vkr::Instance(vk::InstanceCreateInfo{
-        .
-    });
+    m_instance = std::make_unique<vkr::Instance>(std::move(m_context->createInstance(createInfo)));
 }
