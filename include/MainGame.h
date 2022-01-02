@@ -1,3 +1,5 @@
+#include <array>
+#include <string_view>
 #include <GLFW/glfw3.h>
 #include <vulkan/vulkan_raii.hpp>
 namespace vkr = vk::raii;
@@ -13,6 +15,10 @@ public:
     #else
         static constexpr bool enableValidationLayers = false;
     #endif
+    static constexpr auto validationLayers = std::array{
+        "VK_LAYER_KHRONOS_validation"
+    };
+
 
     MainGame();
     ~MainGame();

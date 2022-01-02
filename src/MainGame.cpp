@@ -44,6 +44,31 @@ void MainGame::initWindow()
     m_window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Vulkan", nullptr, nullptr);
 
 }
+
+bool checkValidationLayerSupport() {
+    uint32_t layerCount;
+    vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+
+    std::vector<VkLayerProperties> availableLayers(layerCount);
+    vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
+
+    for (std::string_view layerName : MainGame::validationLayers) {
+        bool layerFound = false;
+
+        for (const auto& layerProperties : availableLayers) {
+            if (layerName ==  layerProperties.layerName) {
+                layerFound = true;
+                break;
+            }
+        }
+
+        if (!layerFound) {
+            return false;
+        }
+    }
+    return true;
+}
+
 void MainGame::initVulkan()
 {
     m_context = std::make_unique<vkr::Context>();
@@ -55,7 +80,13 @@ void MainGame::initVulkan()
     };
     auto createInfo = vk::InstanceCreateInfo {
         .pApplicationInfo = &applicationInfo,
-        
     };
+    if constexpr (enableValidationLayers) {
+        if (!checkValidationLayerSupport())
+            throw std::runtime_error("les validations layers sont activées mais ne sont pas disponibles!");
+        createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+        createInfo.ppEnabledLayerNames = validationLayers.data();
+    }
+
     m_instance = std::make_unique<vkr::Instance>(std::move(m_context->createInstance(createInfo)));
 }
