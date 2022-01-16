@@ -60,6 +60,6 @@ private:
     std::unique_ptr<vkr::PhysicalDevice> m_physicalDevice;
     QueueFamilyIndices m_queueFamilyIndices;
     std::unique_ptr<vkr::Device> m_device;
-    vkr::Queue m_graphicsQueue;
-    vkr::Queue m_presentQueue;
+    std::unique_ptr<vkr::Queue> m_graphicsQueue;
+    std::unique_ptr<vkr::Queue> m_presentQueue;
 };

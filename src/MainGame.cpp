@@ -8,6 +8,8 @@ MainGame::MainGame()
 }
 MainGame::~MainGame()
 {
+    m_presentQueue.reset();
+    m_graphicsQueue.reset();
     m_device.reset();
     m_surface.reset();
     m_instance.reset();
@@ -139,8 +141,8 @@ void MainGame::initDevices()
     }
     m_device = std::make_unique<vkr::Device>(std::move(m_physicalDevice->createDevice(deviceCreateInfo)));
 
-    m_graphicsQueue = m_device->getQueue(m_queueFamilyIndices.graphicsFamily.value(), 0);
-    m_presentQueue = m_device->getQueue(m_queueFamilyIndices.presentFamily.value(), 0);
+    m_graphicsQueue = std::make_unique<vkr::Queue>(m_device->getQueue(m_queueFamilyIndices.graphicsFamily.value(), 0));
+    m_presentQueue = std::make_unique<vkr::Queue>(m_device->getQueue(m_queueFamilyIndices.presentFamily.value(), 0));
 }
 MainGame::QueueFamilyIndices MainGame::findQueueFamily(const vkr::PhysicalDevice& device)
 {
