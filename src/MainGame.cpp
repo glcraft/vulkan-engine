@@ -99,14 +99,14 @@ void MainGame::createSurface()
     if (glfwCreateWindowSurface(**m_instance, m_window, nullptr, &surface) != VK_SUCCESS) {
         throw std::runtime_error("échec de la création de la window surface!");
     }
-    m_surface = std::make_unique<vkr::SurfaceKHR>(m_instance, std::move(surface));
+    m_surface = std::make_unique<vkr::SurfaceKHR>(*m_instance, std::move(surface));
 }
 void MainGame::initDevices()
 {
     auto phy_devices = m_instance->enumeratePhysicalDevices();
     if (phy_devices.empty())
         throw std::runtime_error("Pas de carte graphique supportant Vulkan!");
-    for (const auto& device : phy_devices) {
+    for (auto& device : phy_devices) {
         if (isDeviceSuitable(device)) {
             m_physicalDevice = std::make_unique<vkr::PhysicalDevice>(std::move(device));
             break;
@@ -130,9 +130,10 @@ void MainGame::initDevices()
     }
     vk::PhysicalDeviceFeatures deviceFeatures = {};
     vk::DeviceCreateInfo deviceCreateInfo = {
-        .queueCreateInfoCount = queueCreateInfos.size(),
+        .queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size()),
         .pQueueCreateInfos = queueCreateInfos.data(),
-        .enabledExtensionCount = 0,
+        .enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size()),
+        .ppEnabledExtensionNames = deviceExtensions.data(),
         .pEnabledFeatures = &deviceFeatures,
     };
     if constexpr (enableValidationLayers) {
