@@ -168,11 +168,23 @@ MainGame::QueueFamilyIndices MainGame::findQueueFamily(const vkr::PhysicalDevice
     return indices;
 }
 
+bool checkDeviceExtensionSupport(const vkr::PhysicalDevice& device) {
+    auto availableExtensions = device.enumerateDeviceExtensionProperties();
+    std::set<std::string> requiredExtensions(MainGame::deviceExtensions.begin(), MainGame::deviceExtensions.end());
+
+    for (const auto& extension : availableExtensions) {
+        requiredExtensions.erase(extension.extensionName);
+    }
+    return requiredExtensions.empty();
+}
+
 bool MainGame::isDeviceSuitable(const vkr::PhysicalDevice& device)
 {
-    // auto queueFamilies = device.getQueueFamilyProperties();
-    
-    // auto extensions = device.enumerateDeviceExtensionProperties();
-    // auto features = device.getFeatures();
-    return findQueueFamily(device).isComplete();
+    auto indices = findQueueFamily(device);
+    auto extensionsSupported = checkDeviceExtensionSupport(device);
+    auto swapCHainDetails = SwapChainSupportDetails(device, *m_surface);
+    return 
+        indices.isComplete() 
+        && extensionsSupported
+        && swapCHainDetails.isComplete();
 }

@@ -20,6 +20,9 @@ public:
     static constexpr auto validationLayers = std::array{
         "VK_LAYER_KHRONOS_validation"
     };
+    static constexpr auto deviceExtensions = std::array{
+        VK_KHR_SURFACE_EXTENSION_NAME,
+    };
 
 
     MainGame();
@@ -37,6 +40,34 @@ private:
 
         bool isComplete() {
             return graphicsFamily.has_value() && presentFamily.has_value();
+        }
+    };
+    struct SwapChainSupportDetails {
+        vk::SurfaceCapabilitiesKHR capabilities;
+        std::vector<vk::SurfaceFormatKHR> formats;
+        std::vector<vk::PresentModeKHR> presentModes;
+
+        SwapChainSupportDetails(const vkr::PhysicalDevice& physicalDevice, const vkr::SurfaceKHR& surface) {
+            capabilities = physicalDevice.getSurfaceCapabilitiesKHR(*surface);
+            formats = physicalDevice.getSurfaceFormatsKHR(*surface);
+            presentModes = physicalDevice.getSurfacePresentModesKHR(*surface);
+        }
+        bool isComplete() {
+            return !formats.empty() && !presentModes.empty();
+        }
+        vk::SurfaceFormatKHR chooseSwapSurfaceFormat() {
+            if (formats.size() == 1 && formats[0].format == vk::Format::eUndefined) {
+                return {
+                    .format = vk::Format::eB8G8R8A8Unorm,
+                    .colorSpace = formats[0].colorSpace,
+                };
+            }
+            for (const auto& format : formats) {
+                if (format.format == vk::Format::eR8G8B8A8Srgb && format.colorSpace == vk::ColorSpaceKHR::eSrgbNonlinear) {
+                    return format;
+                }
+            }
+            return formats[0];
         }
     };
 
